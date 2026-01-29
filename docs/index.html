@@ -3,42 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>マイお小遣い帳</title>
+    <title>charin</title>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
-        body { text-align: center; font-family: sans-serif; padding-top: 50px; }
-        img { width: 100px; border-radius: 50%; border: 3px solid #00b900; }
-        .name { font-size: 1.5rem; font-weight: bold; margin-top: 10px; }
+        body { font-family: sans-serif; padding: 20px; text-align: center; }
+        input { width: 80%; padding: 10px; margin: 10px 0; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; }
+        button { width: 85%; padding: 15px; background-color: #00b900; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        button:disabled { background-color: #ccc; }
+        #status { margin-top: 20px; color: #666; }
     </style>
 </head>
 <body>
-    <div id="profile">
-        <img id="pictureUrl" src="" alt="プロフィール画像" style="display:none;">
-        <p class="name" id="displayName">読み込み中...</p>
+    <img id="pictureUrl" style="width: 60px; border-radius: 50%; display: none; margin: 0 auto;">
+    <p id="displayName">読み込み中...</p>
+
+    <div id="form" style="display: none;">
+        <input type="text" id="item" placeholder="何に使った？ (例: ランチ)">
+        <input type="number" id="amount" placeholder="いくら？ (例: 1000)">
+        <button id="sendBtn" onclick="sendData()">スプシに保存する</button>
     </div>
+    
+    <p id="status"></p>
 
     <script>
-        liff.init({
-            liffId: "2009004003-HY8btsxr" // ここはそのまま
-        })
+        const GAS_URL = "https://script.google.com/macros/s/AKfycby348FC1JqutwojMCm17MvzuV-D7Zx9FtnakA1P1Sg9h7sLznmN4i_bPgxSUmgiMb24/exec";
+        let userProfile = null;
+
+        liff.init({ liffId: "2009004003-HY8btsxr" })
         .then(() => {
             if (!liff.isLoggedIn()) {
                 liff.login();
             } else {
-                // ログインしていたらユーザー情報を取得
-                liff.getProfile()
-                    .then(profile => {
-                        document.getElementById('displayName').innerText = "こんにちは、" + profile.displayName + "さん！";
-                        const pic = document.getElementById('pictureUrl');
-                        pic.src = profile.pictureUrl;
-                        pic.style.display = 'block';
-                    })
-                    .catch(err => console.error(err));
+                liff.getProfile().then(profile => {
+                    userProfile = profile;
+                    document.getElementById('displayName').innerText = profile.displayName + "さんの入力";
+                    document.getElementById('pictureUrl').src = profile.pictureUrl;
+                    document.getElementById('pictureUrl').style.display = "block";
+                    document.getElementById('form').style.display = "block";
+                });
             }
         })
-        .catch(err => {
-            document.getElementById('displayName').innerText = "初期化失敗: " + err;
-        });
+        .catch(err => alert("初期化エラー: " + err));
+
+        async function sendData() {
+            const item = document.getElementById('item').value;
+            const amount = document.getElementById('amount').value;
+            const btn = document.getElementById('sendBtn');
+            const status = document.getElementById('status');
+
+            if (!item || !amount) {
+                alert("項目と金額を入力してください！");
+                return;
+            }
+
+            btn.disabled = true;
+            status.innerText = "保存中...";
+
+            const payload = {
+                userName: userProfile.displayName,
+                item: item,
+                amount: amount
+            };
+
+            try {
+                // GASにデータを送信
+                const response = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    status.innerText = "✅ 保存完了！";
+                    document.getElementById('item').value = "";
+                    document.getElementById('amount').value = "";
+                    
+                    // LINEのトークにメッセージを飛ばす（オプション）
+                    if (liff.isInClient()) {
+                        liff.sendMessages([{
+                            type: 'text',
+                            text: `💰 ${userProfile.displayName}が「${item}」に${amount}円使ったよ！`
+                        }]);
+                    }
+                }
+            } catch (e) {
+                status.innerText = "❌ エラー: " + e;
+            } finally {
+                btn.disabled = false;
+            }
+        }
     </script>
 </body>
 </html>
