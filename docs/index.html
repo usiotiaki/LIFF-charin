@@ -2,25 +2,42 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Hello LIFF</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マイお小遣い帳</title>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        body { text-align: center; font-family: sans-serif; padding-top: 50px; }
+        img { width: 100px; border-radius: 50%; border: 3px solid #00b900; }
+        .name { font-size: 1.5rem; font-weight: bold; margin-top: 10px; }
+    </style>
 </head>
 <body>
-    <h1>Hello World!</h1>
-    <p id="message">読み込み中...</p>
+    <div id="profile">
+        <img id="pictureUrl" src="" alt="プロフィール画像" style="display:none;">
+        <p class="name" id="displayName">読み込み中...</p>
+    </div>
 
     <script>
         liff.init({
-            liffId: "2009004003-HY8btsxr" 
+            liffId: "2009004003-HY8btsxr" // ここはそのまま
         })
         .then(() => {
             if (!liff.isLoggedIn()) {
-                liff.login(); // LINEにログインしていなければログイン画面へ
+                liff.login();
+            } else {
+                // ログインしていたらユーザー情報を取得
+                liff.getProfile()
+                    .then(profile => {
+                        document.getElementById('displayName').innerText = "こんにちは、" + profile.displayName + "さん！";
+                        const pic = document.getElementById('pictureUrl');
+                        pic.src = profile.pictureUrl;
+                        pic.style.display = 'block';
+                    })
+                    .catch(err => console.error(err));
             }
-            document.getElementById('message').innerText = "LIFFの起動に成功しました！";
         })
-        .catch((err) => {
-            document.getElementById('message').innerText = "エラー: " + err;
+        .catch(err => {
+            document.getElementById('displayName').innerText = "初期化失敗: " + err;
         });
     </script>
 </body>
