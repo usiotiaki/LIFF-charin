@@ -5,92 +5,107 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>charin</title>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-    <style>
-        body { font-family: sans-serif; padding: 20px; text-align: center; }
-        input { width: 80%; padding: 10px; margin: 10px 0; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; }
-        button { width: 85%; padding: 15px; background-color: #00b900; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
-        button:disabled { background-color: #ccc; }
-        #status { margin-top: 20px; color: #666; }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <img id="pictureUrl" style="width: 60px; border-radius: 50%; display: none; margin: 0 auto;">
-    <p id="displayName">読み込み中...</p>
-
-    <div id="form" style="display: none;">
-        <input type="text" id="item" placeholder="何に使った？ (例: ランチ)">
-        <input type="number" id="amount" placeholder="いくら？ (例: 1000)">
-        <button id="sendBtn" onclick="sendData()">スプシに保存する</button>
-    </div>
+    <!-- <p id="displayName">読み込み中...</p> -->
     
     <p id="status"></p>
 
-    <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycby348FC1JqutwojMCm17MvzuV-D7Zx9FtnakA1P1Sg9h7sLznmN4i_bPgxSUmgiMb24/exec";
-        let userProfile = null;
+    <!-- ヘッダー -->
+    <div class="header">
+        <div class="noteNameArea" style="">
+            <span id="noteName">お小遣い帳</span>
+            <button class="btn-setting" onclick="alert('管理帳の設定画面を開く')"><span class="material-symbols-outlined">settings</span></button>
+        </div>
+        <div class="month-strip">
+            <span class="nav-btn" onclick="calPrev()">◀</span>
+    
+            <div style="display: inline-block; position: relative;">
+                <span id="currentMonthText">2026年 1月</span>
+                <span style="font-size: 0.6rem; margin-left: 2px;">▼</span>
+                <select id="monthSelector" onchange="calJump(this.value)" 
+                        style="position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer;">
+                </select>
+            </div>
 
-        liff.init({ liffId: "2009004003-HY8btsxr" })
-        .then(() => {
-            if (!liff.isLoggedIn()) {
-                liff.login();
-            } else {
-                liff.getProfile().then(profile => {
-                    userProfile = profile;
-                    document.getElementById('displayName').innerText = profile.displayName + "さんの入力";
-                    document.getElementById('pictureUrl').src = profile.pictureUrl;
-                    document.getElementById('pictureUrl').style.display = "block";
-                    document.getElementById('form').style.display = "block";
-                });
-            }
-        })
-        .catch(err => alert("初期化エラー: " + err));
+            <span class="nav-btn" onclick="calNext()">▶</span>
+        </div>
+        <div class="budget-container">
+            <div style="margin-right: 10px;">
+                <span class="budget-label">今週の残高</span><br>
+                <span class="budget-val-main">¥4,300</span>
+            </div>
+            <div style="text-align: right;">
+                <span class="budget-label">予算</span><br>
+                <span style="font-size: 0.9rem; color: #666;">/¥11,000</span>
+            </div>
+            <div>
+                <button class="btn-w2m" onclick="alert('週/月を切り替える')"><span class="material-symbols-outlined">swap_horiz</span></button>
+            </div>
+        </div>
+    </div>
+    <!-- ヘッダーここまで -->
 
-        async function sendData() {
-            const item = document.getElementById('item').value;
-            const amount = document.getElementById('amount').value;
-            const btn = document.getElementById('sendBtn');
-            const status = document.getElementById('status');
+    <!-- カレンダー -->
+    <div id="calendar"></div>
+    <!-- カレンダーここまで -->
 
-            if (!item || !amount) {
-                alert("項目と金額を入力してください！");
-                return;
-            }
+    <!-- フローティングボタン -->
+    <div class="fab-container">
+        <button class="btn-record" onclick="openRecord()">支出の記録</button>
+        <button id="btn-switch" class="btn-switch" onclick="moveSwitchMenu()"><span class="material-symbols-outlined">book</span><span style="font-size: 0.6rem;">◀</span></button>
+    </div>
+    <!-- フローティングボタンここまで -->
 
-            btn.disabled = true;
-            status.innerText = "保存中...";
+    <!-- メニューやモーダルの背景オーバーレイ -->
+    <div id="menuOverlay" class="menuOverlay" onclick="closeModal()"></div>
 
-            const payload = {
-                userName: userProfile.displayName,
-                item: item,
-                amount: amount
-            };
+    <!-- 管理帳切り替えメニュー -->
+    <div id="switchMenu" class="switchMenu modal">
+        <h3 style="color:#F8B600; border-bottom:2px solid #F8B600; padding-bottom:10px;">管理帳の切り替え</h3>
+        <ul id="noteList" style="list-style:none; padding:0; margin-top:20px;">
+            <li style="padding:15px; border-bottom:1px solid #eee; font-weight:bold;" onclick="alert('メインに切り替え')">🏠 メインのお小遣い帳</li>
+            <li style="padding:15px; border-bottom:1px solid #eee; color:#666;" onclick="alert('旅行用に切り替え')">✈️ 夏休み旅行用</li>
+        </ul>
+        <button onclick="alert('新規作成画面へ')" style="width:100%; margin-top:30px; padding:15px; background:#f8f8f8; border:1px dashed #ccc; color:#666; border-radius:10px; font-weight:bold;">
+            + 新しい管理帳を追加
+        </button>
+    </div>
+    <!-- 管理帳切り替えメニューここまで -->
 
-            try {
-                // GASにデータを送信
-                const response = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify(payload)
-                });
+    <!-- 支出記録モーダル -->
+    <!-- <div id="form" style="display: none;"> -->
+    <!-- <div id="form">
+        <input type="text" id="item" placeholder="何に使った？ (例: ランチ)">
+        <input type="number" id="amount" placeholder="いくら？ (例: 1000)">
+        <button id="sendBtn" onclick="sendData()">スプシに保存する</button>
+    </div> -->
+    <div id="recordModal" class="recordModal modal">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="color:#00b900;">支出の記録</h3>
+            <span class="material-symbols-outlined" onclick="closeModal()" style="color:#999;">close</span>
+        </div>
+        <div style="padding:10px 0;">
+            <label style="font-size:0.8rem; color:#666;">使った項目</label>
+            <input type="text" id="title" placeholder="ランチ、コンビニなど" style="width:100%; padding:15px; margin:10px 0; border:1px solid #eee; border-radius:10px; box-sizing:border-box; font-size:16px;">
+            
+            <label style="font-size:0.8rem; color:#666;">金額</label>
+            <input type="number" id="price" placeholder="0" style="width:100%; padding:15px; margin:10px 0; border:1px solid #eee; border-radius:10px; box-sizing:border-box; font-size:16px;">
+            
+            <button id="send-btn" onclick="saveExpense()" style="width:100%; padding:15px; background:#00b900; color:white; border:none; border-radius:10px; font-weight:bold; margin-top:20px;">
+                保存する
+            </button>
+        </div>
+    </div>
+    <!-- 支出記録モーダルここまで -->
 
-                if (response.ok) {
-                    status.innerText = "✅ 保存完了！";
-                    document.getElementById('item').value = "";
-                    document.getElementById('amount').value = "";
-                    
-                    // LINEのトークにメッセージを飛ばす（オプション）
-                    if (liff.isInClient()) {
-                        liff.sendMessages([{
-                            type: 'text',
-                            text: `💰 ${userProfile.displayName}が「${item}」に${amount}円使ったよ！`
-                        }]);
-                    }
-                }
-            } catch (e) {
-                status.innerText = "❌ エラー: " + e;
-            } finally {
-                btn.disabled = false;
-            }
-        }
-    </script>
+
+    <script src="script.js"></script>
+    <script src="calendar.js"></script>
+    <script src="liff.js"></script>
 </body>
 </html>
