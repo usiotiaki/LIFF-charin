@@ -1,4 +1,4 @@
-const GAS_URL = "https://script.google.com/macros/s/AKfycbz9bBbFPBYT-sNS3whP4p1JvKbcJT0Ze0TmTawUuSdgFaEMEMhC7KwL4pjxxTJXsa9N/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzuOW1jROhwHMC8n2k1WPglWlDPrXEgyfayZkyuQs9tFPVjqyZiEv_CZKwVtAozxjXS/exec";
 let userProfile = null;
 
 // liff.init({ liffId: "2009004003-HY8btsxr" })
@@ -18,6 +18,7 @@ let userProfile = null;
 // .catch(err => alert("初期化エラー: " + err));
 
 async function sendData() {
+    const noteID = document.getElementById('noteID').value;
     const title  = document.getElementById('title').value;
     const price  = document.getElementById('price').value;
     const btn    = document.getElementById('send-btn');
@@ -32,6 +33,7 @@ async function sendData() {
     status.innerText = "保存中...";
 
     const payload = {
+        noteID: noteID,
         // userName: userProfile.displayName,
         userName: "ちあき",
         title: title,

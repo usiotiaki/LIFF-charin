@@ -78,12 +78,6 @@
     <!-- 管理帳切り替えメニューここまで -->
 
     <!-- 支出記録モーダル -->
-    <!-- <div id="form" style="display: none;"> -->
-    <!-- <div id="form">
-        <input type="text" id="item" placeholder="何に使った？ (例: ランチ)">
-        <input type="number" id="amount" placeholder="いくら？ (例: 1000)">
-        <button id="sendBtn" onclick="sendData()">スプシに保存する</button>
-    </div> -->
     <div id="recordModal" class="recordModal modal">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <h3 style="color:#00b900;">支出の記録</h3>
@@ -103,6 +97,7 @@
     </div>
     <!-- 支出記録モーダルここまで -->
 
+    <input id="noteID" type="hidden" value="1"> <!-- 管理帳ID -->
 
     <script src="script.js"></script>
     <script src="calendar.js"></script>
