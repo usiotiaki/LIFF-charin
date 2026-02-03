@@ -6,11 +6,12 @@ function doPost(e) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getActiveSheet();
   
-  // データを末尾に追加 [日時, 管理帳ID, 名前, 項目, 金額]
+  // データを末尾に追加 [登録日時, 管理帳ID, 名前, 支出日, 項目, 金額]
   sheet.appendRow([
     new Date(),
     data.noteID,
     data.userName,
+    data.date,
     data.title,
     data.price
   ]);

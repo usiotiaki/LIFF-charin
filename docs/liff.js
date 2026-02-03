@@ -1,4 +1,4 @@
-const GAS_URL = "https://script.google.com/macros/s/AKfycbzuOW1jROhwHMC8n2k1WPglWlDPrXEgyfayZkyuQs9tFPVjqyZiEv_CZKwVtAozxjXS/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzLH_4nutB6wGiAVrxiUQ6vhbeilkIi4h8sh9G1T6nHZiauZcbuJqmCtXOy0ckRVtJk/exec";
 let userProfile = null;
 
 // liff.init({ liffId: "2009004003-HY8btsxr" })
@@ -19,6 +19,7 @@ let userProfile = null;
 
 async function sendData() {
     const noteID = document.getElementById('noteID').value;
+    const date   = document.getElementById('date').value;
     const title  = document.getElementById('title').value;
     const price  = document.getElementById('price').value;
     const btn    = document.getElementById('send-btn');
@@ -36,6 +37,7 @@ async function sendData() {
         noteID: noteID,
         // userName: userProfile.displayName,
         userName: "ちあき",
+        date : date,
         title: title,
         price: price
     };

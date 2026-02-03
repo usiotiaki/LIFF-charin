@@ -14,6 +14,7 @@ function moveSwitchMenu() {
 }
 
 function openRecord() {
+    document.getElementById('date').value=getToday();
     document.getElementById('menuOverlay').classList.add("open");
     document.getElementById('recordModal').classList.add("open");
 }
@@ -21,4 +22,9 @@ function openRecord() {
 async function saveExpense() {
     sendData(); // 支出データをGASに送信
     closeModal();
+}
+
+// 今日の日付を「YYYY-MM-DD」形式で返す
+function getToday() {
+    return new Date().toLocaleDateString('sv')
 }
