@@ -1,19 +1,29 @@
-const GAS_URL = "https://script.google.com/macros/s/AKfycbw1dFCERP9xMJ0c8NMGgaPIfhvZvL7DcRkfb5Aq75SYJMg9_nI49wcwIMfsqRa8ANwv/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbz9mQ4PETqw_1aMcDw3h-wBs3cczqkJM9XxwAZFae4DxvTw_a1Ji_jyBRO0a_qtPkJt/exec";
 let userProfile = null;
 
-liff.init({ liffId: "2009004003-HY8btsxr" })
-.then(() => {
-    if (!liff.isLoggedIn()) {
-        liff.login();
-    } else {
-        liff.getProfile().then(profile => {
-            userProfile = profile;
-            // ユーザー情報をGASに送信して登録・更新
-            registerUserToGas(profile);
-        });
-    }
-})
-.catch(err => alert("初期化エラー: " + err));
+// liff.init({ liffId: "2009004003-HY8btsxr" })
+// .then(() => {
+//     if (!liff.isLoggedIn()) {
+//         liff.login();
+//     } else {
+//         liff.getProfile().then(profile => {
+//             userProfile = profile;
+//             // ユーザー情報をGASに送信して登録・更新
+//             registerUserToGas(profile);
+//         });
+//     }
+// })
+// .catch(err => alert("初期化エラー: " + err));
+
+// ローカルテスト用
+const profile = {
+    userId: "hogehoge",
+    displayName: "tiaki",
+    pictureUrl: "https://profile.line-scdn.net/0h7sa4jjxxaFxMTUB5S_wWIzwdazZvPDFOZH51M3BINDxydCoMMi53PHlLMDxydS4NMHsnai4eZDhAXh86UhuUaEt9NW1wdS4LZSomuA"
+}
+userProfile = profile;
+registerUserToGas(profile);
+
 
 async function sendData() {
     const noteID = document.getElementById('noteID').value;

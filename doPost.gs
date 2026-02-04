@@ -22,16 +22,10 @@ function registerUser(data) {
   // 既存ユーザーの検索
   let targetRow = -1;
   if (lastRow > 1) {
-    const userIds = sheet.getRange(2, 2, lastRow - 1, 2).getValues().flat();
-    console.log("userIds");
-    console.log(userIds);
-    const index = userIds.indexOf(data.userId);
-    console.log("index");
-    console.log(index);
+    const userIds = sheet.getRange(2, 2, lastRow - 1, 1).getValues().flat();
+    const index = userIds.indexOf(data.userID);
     if (index !== -1) {
       targetRow = index + 2; // 行番号は+2 (ヘッダー分と0始まりの補正)
-      console.log("targetRow");
-      console.log(targetRow);
     }
   }
 
