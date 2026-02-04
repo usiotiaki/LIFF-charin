@@ -1,4 +1,5 @@
 let calendar; // カレンダーをグローバル変数にしてどこからでも呼べるようにする
+let expenseCache = {}; // 日付ごとの支出合計を保持するオブジェクト
 
 document.addEventListener('DOMContentLoaded', function() {
     const calendarEl = document.getElementById('calendar');
@@ -9,23 +10,28 @@ document.addEventListener('DOMContentLoaded', function() {
             // カレンダーが動くたびに表示テキストを更新
             const title = info.view.title;
             document.getElementById('currentMonthText').innerText = title;
+            
+            // 表示中の年月を取得してデータを更新
+            const d = calendar.getDate();
+            console.log(d);
+            updateCalendarData(d.getFullYear(), d.getMonth() + 1);
         },
         height: 'auto',
         headerToolbar: false, // 標準のヘッダーは非表示
         dayCellContent: function(arg) {
-            // 日付の数字だけを取り出す
-            return arg.date.getDate();
-        },
-        // 日付マスに予算と実績を流し込む
-        dayCellDidMount: function(info) {
-            const content = document.createElement('div');
-            content.className = 'day-cell-content';
-            // ※本来はここにGASから取得したデータを入れます
-            content.innerHTML = `
-                <div class="budget-val">3,540</div>
-                <div class="spend-val">-7,500</div>
-            `;
-            info.el.querySelector('.fc-daygrid-day-frame').appendChild(content);
+            const dateStr = date2Str(arg.date);
+            const total = expenseCache[dateStr] || 0;
+            
+            // 日付の数字部分（FullCalendarのデフォルト構造に寄せる）
+            let html = `<div class="fc-daygrid-day-top"><a class="fc-daygrid-day-number">${arg.date.getDate()}</a></div>`;
+            
+            // 支出情報の部分
+            html += `<div class="day-cell-content">`;
+            html += `<div class="budget-val">3,540</div>`;
+            const h = total > 0 ? `<div class="spend-val">-${total.toLocaleString()}</div>` : `<div class="spend0-val">0</div>`;
+            html += h+`</div>`;
+
+            return { html: html };
         },
         // 日付をタップした時の処理
         dateClick: function(info) {
@@ -70,5 +76,32 @@ function initMonthSelector() {
         opt.text = text;
         if (i === 0) opt.selected = true;
         select.appendChild(opt);
+    }
+}
+
+// データを取得してカレンダーを再描画する
+async function updateCalendarData(year, month) {
+    if (typeof fetchMonthData === 'function') {
+        showLoading();
+        const data = await fetchMonthData(year, month);
+        
+        // データを日付ごとに集計してキャッシュを更新
+        let cache = {};
+        data.forEach(item => {
+            // item.date は "YYYY-MM-DD" 形式、price は数値または文字列を想定
+            const d = item.date.substring(0, 10);
+            const p = parseInt(item.price, 10);
+            if (!isNaN(p)) {
+                cache[d] = (cache[d] || 0) + p;
+            }
+        });
+        Object.keys(cache).forEach( k => {
+            expenseCache[k] = cache[k];
+        });
+
+        // カレンダーの表示を更新（dayCellDidMountが再度走る）
+        console.log( "updateCalendarDataカレンダーレンダリング！！" )
+        hideLoading();
+        calendar.render();
     }
 }

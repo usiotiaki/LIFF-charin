@@ -151,13 +151,19 @@ body {
     margin-top: auto;
 }
 
+/* 予算: グレー */
 .budget-val {
     color: #555;
 }
 
-/* 予算: 黄色 */
+/* 支出: 赤 */
 .spend-val {
     color: #ff4d4d;
+}
+
+/* 支出なし: ライトグレー */
+.spend0-val {
+    color: #999;
 }
 
 /* 支出: 赤 */
