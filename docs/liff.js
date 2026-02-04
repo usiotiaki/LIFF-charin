@@ -1,4 +1,4 @@
-const GAS_URL = "https://script.google.com/macros/s/AKfycbz3M_gTGLYvs2tQwaKI0k1oVSDB44nQLSXnbxT4eoaH23oXRYcfuWS7JsJvKU8IAgby/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbw1dFCERP9xMJ0c8NMGgaPIfhvZvL7DcRkfb5Aq75SYJMg9_nI49wcwIMfsqRa8ANwv/exec";
 let userProfile = null;
 
 liff.init({ liffId: "2009004003-HY8btsxr" })
