@@ -85,7 +85,7 @@ function initMonthSelector() {
 // データを取得してカレンダーを再描画する
 async function updateCalendarData(year, month) {
     if (typeof fetchMonthData === 'function') {
-        showLoading();
+        showLoading("データ取得中...");
         const data = await fetchMonthData(year, month);
         
         // データを日付ごとに集計してキャッシュを更新

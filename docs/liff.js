@@ -23,7 +23,6 @@ async function sendData() {
     const title  = document.getElementById('title').value;
     const price  = document.getElementById('price').value;
     const btn    = document.getElementById('send-btn');
-    const status = document.getElementById('status');
 
     if (!date || !price) {
         alert("支払日と金額を入力してください！");
@@ -31,7 +30,7 @@ async function sendData() {
     }
 
     btn.disabled = true;
-    status.innerText = "保存中...";
+    showLoading("保存中...");
 
     const payload = {
         noteID: noteID,
@@ -50,7 +49,8 @@ async function sendData() {
         });
 
         if (response.ok) {
-            status.innerText = "✅ 保存完了！";
+            showLoading("✅ 保存完了!");
+            
             document.getElementById('title').value = "";
             document.getElementById('price').value = "";
             
@@ -63,8 +63,11 @@ async function sendData() {
             // }
         }
     } catch (e) {
-        status.innerText = "❌ エラー: " + e;
+        showLoading("❌ エラー: " + e);
     } finally {
+        setTimeout(() => {
+            hideLoading(2);
+        }, 3000);
         btn.disabled = false;
     }
 }

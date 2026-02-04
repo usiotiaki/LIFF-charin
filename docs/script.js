@@ -35,16 +35,13 @@ function date2Str(date) {
 }
 
 // ローディング表示（左下トースト）
-
 let toastFlg = 0; // トースト表示フラグ(flgが1以上の場合はトーストを削除しない)
-
-function showLoading() {
+function showLoading(text) {
     toastFlg++;
     let loader = document.getElementById('loading-toast');
     if (!loader) {
         loader = document.createElement('div');
         loader.id = 'loading-toast';
-        loader.innerText = 'データ更新中...';
         // スタイル設定
         Object.assign(loader.style, {
             position: 'fixed',
@@ -60,13 +57,14 @@ function showLoading() {
         });
         document.body.appendChild(loader);
     }
+    loader.innerText = text;
     loader.style.transition = '0.3s'
     loader.style.left = '0';
 }
-
-function hideLoading() {
-    toastFlg--;
-    if (toastFlg <= 0) {
+// ローディング非表示
+function hideLoading(n = 1) {
+    toastFlg = toastFlg < n ? 0 : toastFlg - n;
+    if (toastFlg == 0) {
         const loader = document.getElementById('loading-toast');
         if (loader) {
             loader.style.transition = '1s'
