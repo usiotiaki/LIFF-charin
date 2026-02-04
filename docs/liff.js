@@ -1,4 +1,4 @@
-const GAS_URL = "https://script.google.com/macros/s/AKfycbzLH_4nutB6wGiAVrxiUQ6vhbeilkIi4h8sh9G1T6nHZiauZcbuJqmCtXOy0ckRVtJk/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwS1nry-lOO4IdKjbARr0udLFJVhekY0VsYD7a72S2pmZbu9kTHFykBvzfGaFw2xniB/exec";
 let userProfile = null;
 
 // liff.init({ liffId: "2009004003-HY8btsxr" })
@@ -25,8 +25,8 @@ async function sendData() {
     const btn    = document.getElementById('send-btn');
     const status = document.getElementById('status');
 
-    if (!title || !price) {
-        alert("項目と金額を入力してください！");
+    if (!date || !price) {
+        alert("支払日と金額を入力してください！");
         return;
     }
 
@@ -66,5 +66,20 @@ async function sendData() {
         status.innerText = "❌ エラー: " + e;
     } finally {
         btn.disabled = false;
+    }
+}
+
+// 指定した年月のデータをGASから取得する
+async function fetchMonthData(year, month) {
+    try {
+        const noteID = document.getElementById('noteID').value;
+        // GASのWebアプリURLにクエリパラメータを付与してGETリクエスト
+        const url = `${GAS_URL}?noteID=${noteID}&year=${year}&month=${month}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        return data; // [{date: '2024-10-01', price: 1000, ...}, ...] の形式を想定
+    } catch (e) {
+        console.error("データ取得エラー:", e);
+        return [];
     }
 }
