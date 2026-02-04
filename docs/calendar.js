@@ -20,7 +20,10 @@ document.addEventListener('DOMContentLoaded', function() {
         headerToolbar: false, // 標準のヘッダーは非表示
         dayCellContent: function(arg) {
             const dateStr = date2Str(arg.date);
-            const total = expenseCache[dateStr] || 0;
+            let total = 0;
+            if ( expenseCache[dateStr] && expenseCache[dateStr].total ){
+                total = expenseCache[dateStr].total;
+            }
             
             // 日付の数字部分（FullCalendarのデフォルト構造に寄せる）
             let html = `<div class="fc-daygrid-day-top"><a class="fc-daygrid-day-number">${arg.date.getDate()}</a></div>`;
@@ -92,9 +95,17 @@ async function updateCalendarData(year, month) {
             const d = item.date.substring(0, 10);
             const p = parseInt(item.price, 10);
             if (!isNaN(p)) {
-                cache[d] = (cache[d] || 0) + p;
+                if( !cache[d] ){
+                    cache[d] = {
+                        total: 0,
+                        detail: []
+                    };
+                }
+                cache[d].total = (cache[d].total || 0) + p;
+                cache[d].detail.push(item);
             }
         });
+        console.log( cache );
         Object.keys(cache).forEach( k => {
             expenseCache[k] = cache[k];
         });
