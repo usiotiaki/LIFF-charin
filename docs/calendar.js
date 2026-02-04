@@ -38,7 +38,10 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         // 日付をタップした時の処理
         dateClick: function(info) {
-            alert('日付タップ: ' + info.dateStr + '\nここに詳細モーダルを出します');
+            // クリックした日付のデータがキャッシュにあればモーダルを表示
+            if (expenseCache[info.dateStr] && expenseCache[info.dateStr].detail.length > 0) {
+                showDetailModal(info.dateStr);
+            }
         }
     });
     calendar.render();

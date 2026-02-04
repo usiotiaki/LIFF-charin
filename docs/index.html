@@ -75,6 +75,25 @@
     </div>
     <!-- 管理帳切り替えメニューここまで -->
 
+    <!-- 支出詳細モーダル -->
+    <div id="detailModal" class="modal-panel modal">
+        <div class="modal-header">
+            <h3 id="detailDate"></h3>
+            <div class="total-amount">
+                <span>合計</span>
+                <strong id="detailTotal"></strong>
+            </div>
+        </div>
+        <ul id="detailList" class="modal-list">
+            <!-- ここに支出リスト表示 -->
+        </ul>
+        <div class="modal-footer">
+            <button class="btn-darailclose" onclick="closeModal()">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+    </div>
+
     <!-- 支出記録モーダル -->
     <div id="recordModal" class="recordModal modal">
         <div style="display:flex; justify-content:space-between; align-items:center;">

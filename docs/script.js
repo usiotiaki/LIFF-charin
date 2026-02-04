@@ -5,6 +5,7 @@ function closeModal() {
     document.getElementById('switchMenu').classList.remove("open");
     document.getElementById('btn-switch').classList.remove("open");
     document.getElementById('recordModal').classList.remove("open");
+    document.getElementById('detailModal').classList.remove("open");
 }
 
 function moveSwitchMenu() {
@@ -71,4 +72,45 @@ function hideLoading(n = 1) {
             loader.style.left = '-100%';
         }
     }
+}
+
+// 支出詳細モーダルを表示する
+function showDetailModal(dateStr) {
+    const data = expenseCache[dateStr];
+    if (!data) return;
+
+    const modal = document.getElementById('detailModal');
+    const listEl = document.getElementById('detailList');
+    const dateEl = document.getElementById('detailDate');
+    const totalEl = document.getElementById('detailTotal');
+
+    // 日付と合計金額を設定
+    const d = new Date(dateStr);
+    dateEl.innerText = `${d.getMonth() + 1}月${d.getDate()}日`;
+    totalEl.innerText = `¥${data.total.toLocaleString()}`;
+
+    // リストをクリア
+    listEl.innerHTML = '';
+
+    // 支出項目をリストに追加
+    data.detail.forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'detail-item';
+        
+        const userIcon = item.user.pictureUrl ? `<img src="${item.user.pictureUrl}" class="user-icon" alt="">` : `<div class="user-icon-placeholder"></div>`;
+        
+        li.innerHTML = `
+            <div class="detail-item-user">
+                ${userIcon}
+                <span>${item.user.displayName}</span>
+            </div>
+            <div class="detail-item-title">${item.title || '（項目名なし）'}</div>
+            <div class="detail-item-price">¥${item.price.toLocaleString()}</div>
+        `;
+        listEl.appendChild(li);
+    });
+
+    // モーダルとオーバーレイを表示
+    document.getElementById('menuOverlay').classList.add("open");
+    modal.classList.add("open");
 }
