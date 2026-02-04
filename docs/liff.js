@@ -1,21 +1,19 @@
-const GAS_URL = "https://script.google.com/macros/s/AKfycbwS1nry-lOO4IdKjbARr0udLFJVhekY0VsYD7a72S2pmZbu9kTHFykBvzfGaFw2xniB/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbz3M_gTGLYvs2tQwaKI0k1oVSDB44nQLSXnbxT4eoaH23oXRYcfuWS7JsJvKU8IAgby/exec";
 let userProfile = null;
 
-// liff.init({ liffId: "2009004003-HY8btsxr" })
-// .then(() => {
-//     if (!liff.isLoggedIn()) {
-//         liff.login();
-//     } else {
-//         liff.getProfile().then(profile => {
-//             userProfile = profile;
-//             document.getElementById('displayName').innerText = profile.displayName + "さんの入力";
-//             document.getElementById('pictureUrl').src = profile.pictureUrl;
-//             document.getElementById('pictureUrl').style.display = "block";
-//             document.getElementById('form').style.display = "block";
-//         });
-//     }
-// })
-// .catch(err => alert("初期化エラー: " + err));
+liff.init({ liffId: "2009004003-HY8btsxr" })
+.then(() => {
+    if (!liff.isLoggedIn()) {
+        liff.login();
+    } else {
+        liff.getProfile().then(profile => {
+            userProfile = profile;
+            // ユーザー情報をGASに送信して登録・更新
+            registerUserToGas(profile);
+        });
+    }
+})
+.catch(err => alert("初期化エラー: " + err));
 
 async function sendData() {
     const noteID = document.getElementById('noteID').value;
@@ -33,9 +31,9 @@ async function sendData() {
     showLoading("保存中...");
 
     const payload = {
+        action: "record", // 支出記録のアクションを指定
         noteID: noteID,
-        // userName: userProfile.displayName,
-        userName: "ちあき",
+        userID: userProfile.userId,
         date : date,
         title: title,
         price: price
@@ -69,6 +67,28 @@ async function sendData() {
             hideLoading(2);
         }, 3000);
         btn.disabled = false;
+    }
+}
+
+// ユーザー情報をGASに登録・更新する
+async function registerUserToGas(profile) {
+    const noteID = document.getElementById('noteID').value;
+    const payload = {
+        action: "register_user",
+        userID: profile.userId,
+        displayName: profile.displayName,
+        pictureUrl: profile.pictureUrl,
+        noteID: noteID // 画面上のnoteIDも紐付けのために送信
+    };
+
+    try {
+        // バックグラウンドで送信するためawaitしない、またはエラーハンドリングを軽めにする
+        fetch(GAS_URL, {
+            method: "POST",
+            body: JSON.stringify(payload)
+        }).then(res => console.log("User update request sent"));
+    } catch (e) {
+        console.error("ユーザー登録エラー:", e);
     }
 }
 
