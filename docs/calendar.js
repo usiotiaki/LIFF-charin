@@ -29,8 +29,9 @@ document.addEventListener('DOMContentLoaded', function() {
             let html = `<div class="fc-daygrid-day-top"><a class="fc-daygrid-day-number">${arg.date.getDate()}</a></div>`;
             
             // 支出情報の部分
+            const dailyBudgetText = dailyBudget > 0 ? dailyBudget.toLocaleString() : '0';
             html += `<div class="day-cell-content">`;
-            html += `<div class="budget-val">3,540</div>`;
+            html += `<div class="budget-val">${dailyBudgetText}</div>`;
             const h = total > 0 ? `<div class="spend-val">-${total.toLocaleString()}</div>` : `<div class="spend0-val">0</div>`;
             html += h+`</div>`;
 
@@ -89,12 +90,13 @@ function initMonthSelector() {
 async function updateCalendarData(year, month) {
     if (typeof fetchMonthData === 'function') {
         showLoading("データ取得中...");
-        const data = await fetchMonthData(year, month);
+        const responseData = await fetchMonthData(year, month);
+        const data = responseData || [];
         
         // データを日付ごとに集計してキャッシュを更新
         let cache = {};
         data.forEach(item => {
-            // item.date は "YYYY-MM-DD" 形式、price は数値または文字列を想定
+            // item.date は "YYYY-MM-DD" 形式
             const d = item.date.substring(0, 10);
             const p = parseInt(item.price, 10);
             if (!isNaN(p)) {
@@ -109,9 +111,28 @@ async function updateCalendarData(year, month) {
             }
         });
         console.log( cache );
+        
+        let mCheckFlg = true;
+        let wCheckFlg = true;
         Object.keys(cache).forEach( k => {
             expenseCache[k] = cache[k];
+            
+            if( is_this_month(k) ) { // 日付が今月の場合
+                if( mCheckFlg ){
+                    mPay = 0; // 今月の支出合計 初期化
+                    mCheckFlg = false; // 初期化フラグOFF
+                }
+                mPay += cache[k].total; // 今月の支払い金額に加算
+            }
+            if( is_this_week(k) ) { // 日付が今週の場合
+                if( wCheckFlg ){
+                    wPay = 0; // 今週の支出合計 初期化
+                    wCheckFlg = false; // 初期化フラグOFF
+                }
+                wPay += cache[k].total; // 今週の支払い金額に加算
+            }
         });
+        updateBudget(); // 予算表示を更新
 
         // カレンダーの表示を更新（dayCellDidMountが再度走る）
         console.log( "updateCalendarDataカレンダーレンダリング！！" )

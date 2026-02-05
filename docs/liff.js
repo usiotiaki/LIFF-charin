@@ -102,7 +102,7 @@ async function registerUserToGas(profile) {
     }
 }
 
-// 指定した年月のデータをGASから取得する
+// 指定した年月の支出データをGASから取得する
 async function fetchMonthData(year, month) {
     try {
         const noteID = document.getElementById('noteID').value;

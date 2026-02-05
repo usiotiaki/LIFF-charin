@@ -30,10 +30,32 @@ function getToday() {
     return date2Str(new Date())
 }
 
-// 日付を「YYYY-MM-DD」形式で返す
+// 日付(dateオブジェクト)を「YYYY-MM-DD」形式で返す
 function date2Str(date) {
     return date.toLocaleDateString('sv')
 }
+
+// date(ex."2026-02-05")が今月の場合true
+function is_this_month(date) {
+    const m = getToday().slice(0, 7); // ex."2026-02"
+    const tgtm = date.slice(0, 7);
+    return m == tgtm;
+}
+
+// date(ex."2026-02-05")が今週の場合true
+function is_this_week(target_date){
+    // 今日の日付(dateオブジェクト)を取得
+    let today = new Date();
+    let today_day_index = today.getDay(); // 日:0-土:6
+    
+    let lastSunday = new Date(new Date().setDate(today.getDate() - today_day_index));
+    const lastSundayTxt = date2Str(lastSunday);
+    let nextSaturday = new Date(lastSunday.setDate(lastSunday.getDate() + 6));
+    const nextSaturdayTxt = date2Str(nextSaturday);
+
+    return target_date >= lastSundayTxt && target_date <= nextSaturdayTxt;
+}
+
 
 // ローディング表示（左下トースト）
 let toastFlg = 0; // トースト表示フラグ(flgが1以上の場合はトーストを削除しない)
@@ -113,4 +135,43 @@ function showDetailModal(dateStr) {
     // モーダルとオーバーレイを表示
     document.getElementById('menuOverlay').classList.add("open");
     modal.classList.add("open");
+}
+
+// 予算表示まわり
+let monthlyBudget = 30000;   // 月予算 TODO:Notesからデータ取得
+let dailyBudget   = 0;   // 日当たり予算
+let displaySpan   = "w"; // "w":今週、"m":今月 
+let wPay = 0; // 今週の支出額
+let mPay = 0; // 今月の支出額
+
+function updateBudget() {
+    dailyBudget = Math.floor( monthlyBudget / 31 );
+    const displayTxt = displaySpan == "m" ? "今月" : "今週";
+    const displayBudget = displaySpan == "m" ? monthlyBudget : dailyBudget * 7;
+    const displayBalance = displaySpan == "m" ? displayBudget - mPay : displayBudget - wPay;
+
+    // ヘッダーの表示予算を更新
+    const spanEl = document.getElementById('spanDisplay'); // 今週/今月
+    if (spanEl) {
+        spanEl.innerText = displayTxt;
+    }
+    const budgetEl = document.getElementById('budgetDisplay'); // 予算
+    if (budgetEl) {
+        budgetEl.innerText = displayBudget.toLocaleString();
+    }
+    const balanceEl = document.getElementById('balanceDisplay'); // 残高
+    if (balanceEl) {
+        if( displayBalance < 0 ){
+            balanceEl.style.color = "red";
+        } else {
+            balanceEl.style.color = "inherit";
+        }
+        balanceEl.innerText = "¥"+displayBalance.toLocaleString();
+    }
+}
+updateBudget(); // TODO:Notesからデータ取得できるようにしたらデータ取得後の処理に移動
+
+function switchWeekMonth() {
+    displaySpan = displaySpan == "w" ? "m" : "w";
+    updateBudget();
 }

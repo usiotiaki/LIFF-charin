@@ -34,15 +34,15 @@
         </div>
         <div class="budget-container">
             <div style="margin-right: 10px;">
-                <span class="budget-label">今週の残高</span><br>
-                <span class="budget-val-main">¥4,300</span>
+                <span class="budget-label"><span id="spanDisplay">今週</span>の残高</span><br>
+                <span class="budget-val-main"><span id="balanceDisplay">¥-----</span></span>
             </div>
             <div style="text-align: right;">
                 <span class="budget-label">予算</span><br>
-                <span style="font-size: 0.9rem; color: #666;">/¥11,000</span>
+                <span style="font-size: 0.9rem; color: #666;">/¥<span id="budgetDisplay">-----</span></span>
             </div>
             <div>
-                <button class="btn-w2m" onclick="alert('週/月を切り替える')"><span class="material-symbols-outlined">swap_horiz</span></button>
+                <button class="btn-w2m" onclick="switchWeekMonth()"><span class="material-symbols-outlined">swap_horiz</span></button>
             </div>
         </div>
     </div>
