@@ -1,10 +1,49 @@
 function doGet(e) {
+  const action = e.parameter.action;
+
+  if (action === 'get_note_info') {
+    return getNoteInfo(e);
+  } else {
+    // デフォルトは支出情報の取得
+    return getExpenses(e);
+  }
+}
+
+// 管理帳情報（予算など）を取得
+function getNoteInfo(e) {
+  const noteID = e.parameter.noteID;
+
+  // --- Notesシートから管理帳名、予算情報を取得 ---
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const notesSheet = ss.getSheetByName('Notes');
+  const notesRows = notesSheet.getDataRange().getValues();
+
+  let noteName = "名称未設定"; // デフォルトは"名称未設定"
+  let monthlyBudget = 0;     // デフォルトは0
+  for (let i = 1; i < notesRows.length; i++) { // 1行目はヘッダーなのでスキップ
+    const nRow = notesRows[i];
+    const currentNoteID = nRow[1]; // B列: noteID
+    if (Number(currentNoteID) === Number(noteID)) {
+      noteName = nRow[2] || "名称未設定"; // C列: name (空の場合は"名称未設定")
+      monthlyBudget = nRow[3] || 0; // D列: budget (空の場合は0)
+      break; // 見つかったらループを抜ける
+    }
+  }
+
+  // 支出情報
+  return ContentService.createTextOutput(JSON.stringify({
+    name: noteName,
+    budget: monthlyBudget
+  })).setMimeType(ContentService.MimeType.JSON);
+}
+
+// 支出情報を取得
+function getExpenses(e) {
   const noteID = e.parameter.noteID;
   const year = e.parameter.year;
   const month = e.parameter.month;
-
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  // 支出情報
+
   const sheet = ss.getSheetByName('Expenses');
   const rows = sheet.getDataRange().getValues();
   // ユーザー情報

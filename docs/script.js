@@ -138,12 +138,13 @@ function showDetailModal(dateStr) {
 }
 
 // 予算表示まわり
-let monthlyBudget = 30000;   // 月予算 TODO:Notesからデータ取得
+let monthlyBudget = 0;   // 月予算 TODO:Notesからデータ取得
 let dailyBudget   = 0;   // 日当たり予算
 let displaySpan   = "w"; // "w":今週、"m":今月 
 let wPay = 0; // 今週の支出額
 let mPay = 0; // 今月の支出額
 
+// 予算表示更新処理
 function updateBudget() {
     dailyBudget = Math.floor( monthlyBudget / 31 );
     const displayTxt = displaySpan == "m" ? "今月" : "今週";

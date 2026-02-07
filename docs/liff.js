@@ -1,4 +1,4 @@
-const GAS_URL = "https://script.google.com/macros/s/AKfycbz9mQ4PETqw_1aMcDw3h-wBs3cczqkJM9XxwAZFae4DxvTw_a1Ji_jyBRO0a_qtPkJt/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwSZ1whfscvE3VAtXgqbplE8OSileJ36ATONluc-v1KPmPD7m0KiipQlfvRf0Cjqlt8/exec";
 let userProfile = null;
 
 // liff.init({ liffId: "2009004003-HY8btsxr" })
@@ -116,3 +116,24 @@ async function fetchMonthData(year, month) {
         return [];
     }
 }
+
+// 指定した管理帳の設定をGASから取得する
+async function fetchNoteData() {
+    try {
+        const noteID = document.getElementById('noteID').value;
+        // GASのWebアプリURLにクエリパラメータを付与してGETリクエスト
+        const url = `${GAS_URL}?action=get_note_info&noteID=${noteID}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        return data; // { "name": "管理帳名称", "budget": 0 }の形式を想定
+    } catch (e) {
+        console.error("データ取得エラー:", e);
+        return [];
+    }
+}
+
+const noteNameArea = document.getElementById('noteName');
+fetchNoteData().then(data => {
+    noteNameArea.innerText = data.name;
+    monthlyBudget = data.budget;
+});
