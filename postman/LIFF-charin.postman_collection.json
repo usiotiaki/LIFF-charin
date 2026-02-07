@@ -1,0 +1,71 @@
+{
+  "info": {
+    "_postman_id": "0cf8785c-af06-4ab0-85aa-11cb4e4d4584",
+    "name": "LIFF-charin",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "52159121",
+    "_collection_link": "https://go.postman.co/collection/52159121-0cf8785c-af06-4ab0-85aa-11cb4e4d4584?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "getNoteInfo",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{URI}}?action=get_note_info&noteID=1",
+          "host": [
+            "{{URI}}"
+          ],
+          "query": [
+            {
+              "key": "action",
+              "value": "get_note_info",
+              "type": "text"
+            },
+            {
+              "key": "noteID",
+              "value": "1",
+              "type": "text"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "getExpenses",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{URI}}?noteID=1&year=2026&month=2",
+          "host": [
+            "{{URI}}"
+          ],
+          "query": [
+            {
+              "key": "action",
+              "value": "getExpenses",
+              "type": "text",
+              "disabled": true
+            },
+            {
+              "key": "noteID",
+              "value": "1"
+            },
+            {
+              "key": "year",
+              "value": "2026"
+            },
+            {
+              "key": "month",
+              "value": "2"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
